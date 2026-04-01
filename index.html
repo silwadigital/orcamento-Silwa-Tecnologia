@@ -1,391 +1,412 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orçamento - Silwa Tecnologia</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <title>Silwa Tecnologia - Orçamento</title>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
     <style>
-        :root {
-            /* Cores baseadas na identidade visual da imagem enviada */
-            --silwa-purple: #9600c6; /* Roxo vibrante da logo */
-            --silwa-dark: #4a0063;
-            --silwa-light: #f3e5f5;
-            --text-color: #333;
-            --border-color: #e0e0e0;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-            color: var(--text-color);
-        }
-
-        /* Área de Controles (Não sai no PDF) */
-        .controls {
-            max-width: 900px;
-            margin: 0 auto 20px auto;
-            text-align: right;
-        }
-
-        .btn-pdf {
-            background-color: var(--silwa-purple);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: background 0.3s;
-        }
-
-        .btn-pdf:hover {
-            background-color: var(--silwa-dark);
-        }
-
-        /* Folha A4 simulada */
-        .page {
-            max-width: 900px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 40px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            border-radius: 8px;
-        }
-
-        /* Cabeçalho */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 3px solid var(--silwa-purple);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-
-        .logo-container img {
-            max-width: 200px; /* Ajuste conforme necessário */
-            height: auto;
-        }
+        /* Reset e Fonte */
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7f6; margin: 0; padding: 0; color: #333; }
+        .container { max-width: 1200px; margin: 40px auto; padding: 20px; }
         
-        /* Fallback caso a imagem não carregue */
-        .logo-fallback {
-            background-color: var(--silwa-purple);
-            color: white;
-            padding: 15px 25px;
-            font-weight: 900;
-            font-size: 24px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+        h1 { color: #007bff; font-weight: normal; margin-bottom: 5px; }
+        h1 strong { font-weight: bold; }
+        .subtitle { color: #666; font-size: 0.9em; margin-bottom: 30px; }
+
+        /* Grid Principal */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
         }
 
-        .company-info {
-            text-align: right;
+        /* Estilo dos Módulos (Checkboxes) */
+        .modules-list { display: flex; flex-direction: column; gap: 10px; }
+        
+        .module-item {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #007bff;
+            border-right: 1px solid #ddd;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            transition: 0.2s;
         }
+        .module-item:hover { background-color: #f8faff; }
+        .module-item input[type="checkbox"] { margin-right: 10px; cursor: pointer; }
+        .module-name { font-weight: 600; font-size: 0.9em; color: #444;}
+        .price { color: #00bfff; font-weight: bold; font-size: 0.9em;}
 
-        .company-info h1 {
-            margin: 0;
-            color: var(--silwa-purple);
-            font-size: 1.5rem;
-            text-transform: uppercase;
+        /* Estilo dos Cards (Rádios) */
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+            height: fit-content;
         }
-
-        .company-info p {
-            margin: 5px 0 0;
-            font-size: 0.9rem;
-            color: #666;
+        .card h3 { color: #00bfff; margin-top: 0; font-size: 1.2em; margin-bottom: 20px; }
+        
+        .radio-item {
+            display: block;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #555;
+            cursor: pointer;
         }
+        .radio-item input[type="radio"] { margin-right: 8px; }
+        .radio-price { color: #00bfff; font-weight: bold; display: block; margin-left: 25px; margin-top: 2px;}
 
-        /* Tabela de Serviços */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
+        /* Total Section e Implantação */
+        .total-section {
+            background: #fff;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+            text-align: center;
+            margin-top: 30px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            border-top: 4px solid #00bfff;
         }
-
-        thead {
-            background-color: var(--silwa-purple);
-            color: white;
-        }
-
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid var(--border-color);
+        .input-group {
+            margin-bottom: 15px;
             text-align: left;
         }
-
-        th {
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-        }
-
-        /* Inputs dentro da tabela para edição limpa */
-        input[type="number"] {
-            width: 60px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            text-align: center;
-            font-size: 1rem;
-            color: var(--silwa-purple);
+        .input-group label {
+            display: block;
             font-weight: bold;
+            color: #444;
+            margin-bottom: 8px;
+            font-size: 0.9em;
         }
-
-        /* Seção de Implantação */
-        .deployment-section {
-            background-color: var(--silwa-light);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border-left: 5px solid var(--silwa-purple);
-        }
-
-        .deployment-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .deployment-header h3 {
-            margin: 0;
-            color: var(--silwa-dark);
-        }
-
-        textarea {
-            width: 98%;
-            height: 60px;
+        .input-group input, .input-group select {
+            width: 100%;
             padding: 10px;
+            font-size: 1em;
             border: 1px solid #ccc;
-            border-radius: 4px;
-            resize: vertical;
-            font-family: inherit;
-            margin-bottom: 10px;
+            border-radius: 5px;
         }
-
-        .deployment-price-row {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .deployment-price-row input {
-            width: 120px;
-            text-align: right;
-        }
-
-        /* Área de Totais */
-        .totals-area {
-            text-align: right;
-            margin-top: 20px;
-        }
-
-        .total-row {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-            color: #555;
-        }
-
-        .grand-total {
-            font-size: 2rem;
-            color: var(--silwa-purple);
-            font-weight: 800;
-            margin-top: 15px;
-            border-top: 2px solid var(--border-color);
-            padding-top: 15px;
-            display: inline-block;
-        }
-
-        /* Rodapé */
-        .footer {
-            margin-top: 50px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #999;
+        .total-section hr {
+            border: none;
             border-top: 1px solid #eee;
-            padding-top: 20px;
+            margin: 25px 0;
         }
+        
+        .total-box { margin-bottom: 20px; }
+        .total-box h4 { color: #666; margin: 0 0 5px 0; font-size: 1.1em; font-weight: normal; }
+        .total-price { font-size: 2.2em; color: #007bff; font-weight: bold; }
+        .installments-text { color: #28a745; font-size: 0.9em; font-weight: bold; margin-top: 5px; }
 
-        /* Formatação de Moeda */
-        .money {
-            font-family: 'Courier New', Courier, monospace;
+        .btn-solicitar {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
             font-weight: bold;
+            width: 100%;
+            font-size: 1.1em;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        .btn-solicitar:hover { background-color: #0056b3; }
+
+        /* Responsividade */
+        @media (max-width: 900px) {
+            .grid-container { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-
-    <div class="controls">
-        <button class="btn-pdf" onclick="generatePDF()">📥 Baixar Orçamento em PDF</button>
-    </div>
-
-    <div class="page" id="element-to-print">
+    <div class="container">
+        <h1>Tabela de preço <br><strong>Silwa Tecnologia </strong></h1>
+        <p class="subtitle">Escolha os módulos necessários para o seu negócio.</p>
         
-        <header>
-            <div class="logo-container">
-                <img src="IMPLANTAÇÃO.png" alt="SILWA DIGITAL" onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='block';">
-                <div id="fallback-logo" class="logo-fallback" style="display:none;">SILWA TECNOLOGIA - PDV LEGAL</div>
-            </div>
-            <div class="company-info">
-                <h1>Silwa Tecnologia</h1>
-                <p>Soluções em Automação e Gestão</p>
-                <p>Data: <span id="current-date"></span></p>
-            </div>
-        </header>
-
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50%;">Descrição do Serviço / Módulo</th>
-                    <th style="width: 15%; text-align: center;">Qtd.</th>
-                    <th style="width: 15%; text-align: right;">Valor Unit.</th>
-                    <th style="width: 20%; text-align: right;">Total</th>
-                </tr>
-            </thead>
-            <tbody id="services-body">
-                </tbody>
-        </table>
-
-        <div class="deployment-section">
-            <div class="deployment-header">
-                <h3>⚙️ Taxa de Implantação e Configuração</h3>
-            </div>
-            <textarea id="deploy-desc" placeholder="Descreva aqui os detalhes da implantação (Ex: Treinamento, instalação em 3 terminais, configuração de cardápio digital...)"></textarea>
+        <div class="grid-container">
             
-            <div class="deployment-price-row">
-                <label><strong>Valor da Implantação:</strong></label>
-                <input type="number" id="deploy-price" value="0.00" step="10.00" oninput="updateCalculations()">
+            <div class="modules-list">
+                <label class="module-item">
+                    <div><input type="checkbox" class="calc-item" data-name="Cloud" data-price="79.90"><span class="module-name">Cloud</span></div>
+                    <span class="price">- R$79,90</span>
+                </label>
+                <label class="module-item">
+                    <div><input type="checkbox" class="calc-item" data-name="Módulo Estoque" data-price="85.00"><span class="module-name">Módulo Estoque</span></div>
+                    <span class="price">- R$85,00</span>
+                </label>
+                <label class="module-item">
+                    <div><input type="checkbox" class="calc-item" data-name="Módulo Fiscal" data-price="85.00"><span class="module-name">Módulo Fiscal</span></div>
+                    <span class="price">- R$85,00</span>
+                </label>
+                <label class="module-item">
+                    <div><input type="checkbox" class="calc-item" data-name="Módulo Financeiro" data-price="85.00"><span class="module-name">Módulo Financeiro</span></div>
+                    <span class="price">- R$85,00</span>
+                </label>
+                <label class="module-item">
+                    <div><input type="checkbox" class="calc-item" data-name="Módulo de Serviço" data-price="85.00"><span class="module-name">Módulo de Serviço</span></div>
+                    <span class="price">- R$85,00</span>
+                </label>
+                <label class="module-item">
+                    <div><input type="checkbox" class="calc-item" data-name="Integração iFood" data-price="50.00"><span class="module-name">Integração iFood</span></div>
+                    <span class="price">- R$50,00</span>
+                </label>
+                <label class="module-item">
+                    <div><input type="checkbox" class="calc-item" data-name="Fidelidade Legal" data-price="219.90"><span class="module-name">Fidelidade Legal</span></div>
+                    <span class="price">- R$219,90</span>
+                </label>
+                <label class="module-item">
+                    <div><input type="checkbox" class="calc-item" data-name="Módulo Conta Assinada" data-price="00.00"><span class="module-name">Módulo Conta Assinada</span></div>
+                    <span class="price">- R$00,00</span>
+                </label>
+                <label class="module-item">
+                    <div><input type="checkbox" class="calc-item" data-name="PDV Legal Fast" data-price="289.80"><span class="module-name">PDV Legal Fast</span></div>
+                    <span class="price">- R$289.80</span>
+                </label>
+                <label class="module-item">
+                    <div><input type="checkbox" class="calc-item" data-name="Mata Ficha" data-price="50.00"><span class="module-name">Mata Ficha</span></div>
+                    <span class="price">- R$50,00</span>
+                </label>
+                <label class="module-item">
+                    <div><input type="checkbox" class="calc-item" data-name="Validação de CPF" data-price="69.90"><span class="module-name">Validação de CPF</span></div>
+                    <span class="price">- R$69,90</span>
+                </label>
+                <label class="module-item">
+                    <div><input type="checkbox" class="calc-item" data-name="PDV Legal Full" data-price="999.99"><span class="module-name">PDV Legal Full</span></div>
+                    <span class="price">- R$999,99</span>
+                </label>
+                <label class="module-item">
+                    <div><input type="checkbox" class="calc-item" data-name="Certificado Digital" data-price="259.90"><span class="module-name">Certificado Digital</span></div>
+                    <span class="price">- R$259,90</span>
+                </label>
+            </div>
+
+            <div class="card">
+                <h3>PDV's</h3>
+                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - Nenhuma" data-price="0" checked> Nenhuma</label>
+                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 1" data-price="69,90"> 1 - R$69,90</label>
+                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 2" data-price="69,90"> 2 - R$69,90</label>
+                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 3" data-price="89.90"> 3 - R$89.90</label>
+                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 4" data-price="89.90"> 4 - R$89.90</label>
+                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 5" data-price="89.90"> 5 - R$89.90</label>
+                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 6" data-price="139.00"> 6 - R$139,00</label>
+                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 7" data-price="139.00"> 7 - R$139,00</label>
+                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 8" data-price="199.00"> 8 - R$199,00</label>
+                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 9" data-price="199.00"> 9 - R$199,00</label>
+                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 10" data-price="199.00"> 10 - R$199,00</label>
+            </div>
+            
+            <div class="card">
+                <h3>Planos Delivery Legal</h3>
+                <label class="radio-item">
+                    <input type="radio" name="planos" class="calc-item" data-name="Delivery - Não é necessário" data-price="0" checked> Não é necessário
+                </label>
+                <label class="radio-item">
+                    <input type="radio" name="planos" class="calc-item" data-name="Delivery - Plano 1" data-price="199.90"> Plano 1
+                    <span class="radio-price">Até 25k de Faturamento - R$199,90</span>
+                </label>
+                <label class="radio-item">
+                    <input type="radio" name="planos" class="calc-item" data-name="Delivery - Plano 2" data-price="279.90"> Plano 2
+                    <span class="radio-price">Acima de 25k de Faturamento - R$279,90</span>
+                </label>
             </div>
         </div>
 
-        <div class="totals-area">
-            <div class="total-row">
-                <span>Total Mensalidade: &nbsp;</span>
-                <span id="monthly-total" class="money">R$ 0,00</span>
+        <div class="total-section">
+            <div style="display: flex; gap: 15px;">
+                <div class="input-group" style="flex: 1;">
+                    <label for="input-implantacao">Valor de Implantação (R$)</label>
+                    <input type="number" id="input-implantacao" placeholder="Ex: 600.00" min="0" step="0.01">
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label for="select-parcelas">Parcelamento</label>
+                    <select id="select-parcelas">
+                        <option value="1">À vista</option>
+                        <option value="2">2x sem juros</option>
+                        <option value="3">3x sem juros</option>
+                        <option value="4">4x sem juros</option>
+                        <option value="5">5x sem juros</option>
+                        <option value="6">6x sem juros</option>
+                        <option value="7">7x sem juros</option>
+                        <option value="8">8x sem juros</option>
+                        <option value="9">9x sem juros</option>
+                        <option value="10">10x sem juros</option>
+                        <option value="11">11x sem juros</option>
+                        <option value="12">12x sem juros</option>
+                    </select>
+                </div>
             </div>
-            <div class="total-row">
-                <span>Total Implantação (Único): &nbsp;</span>
-                <span id="deploy-total-display" class="money">R$ 0,00</span>
+            
+            <hr>
+            
+            <div class="total-box">
+                <h4>Total Mensal (Recorrente)</h4>
+                <div class="total-price" id="valor-mensal">R$ 0,00</div>
             </div>
-            <div class="grand-total">
-                TOTAL DA PROPOSTA: <span id="grand-total">R$ 0,00</span>
-            </div>
-        </div>
 
-        <div class="footer">
-            <p>Este orçamento tem validade de 10 dias. Valores sujeitos a alteração sem aviso prévio.</p>
-            <p>Silwa Tecnologia © 2025</p>
+            <div class="total-box">
+                <h4>Total Implantação (Único)</h4>
+                <div class="total-price" id="valor-implantacao-display" style="color: #444; font-size: 1.8em;">R$ 0,00</div>
+                <div class="installments-text" id="texto-parcelas"></div>
+            </div>
+
+            <button class="btn-solicitar" id="btn-gerar-pdf">GERAR ORÇAMENTO EM PDF</button>
         </div>
     </div>
 
     <script>
-        // Data Atual
-        const date = new Date();
-        document.getElementById('current-date').innerText = date.toLocaleDateString('pt-BR');
+        // --- LÓGICA DE CÁLCULO ---
+        const inputs = document.querySelectorAll('.calc-item');
+        const inputImplantacao = document.getElementById('input-implantacao');
+        const selectParcelas = document.getElementById('select-parcelas');
+        
+        const displayMensal = document.getElementById('valor-mensal');
+        const displayImplantacao = document.getElementById('valor-implantacao-display');
+        const displayTextoParcelas = document.getElementById('texto-parcelas');
+        
+        // Variáveis globais para o PDF
+        let totalMensalGlobal = 0; 
+        let totalImplantacaoGlobal = 0;
+        let qtdParcelasGlobal = 1;
+        let valorParcelaGlobal = 0;
 
-        // Dados dos produtos (Custo + 70% Margem)
-        const products = [
-            { name: "Gestão", price: 42.62, qty: 1 },
-            { name: "Usuário Cloud", price: 0.00, qty: 1 },
-            { name: "PDV/Comandas", price: 23.90, qty: 6 },
-            { name: "NFCE", price: 40.80, qty: 1 },
-            { name: "Estoque", price: 43.86, qty: 1 },
-            { name: "Financeiro", price: 42.50, qty: 1 },
-            { name: "Validador de Tickets", price: 19.89, qty: 1 },
-            { name: "Validador de CPF", price: 19.89, qty: 1 },
-            { name: "Conta Assinada", price: 18.26, qty: 1 },
-            { name: "PDV Fast", price: 298.25, qty: 1 },
-            { name: "Certificado Digital", price: 200.60, qty: 1 },
-            { name: "Fidelidade Legal", price: 221.00, qty: 1 },
-            { name: "Totem Autoatendimento", price: 168.30, qty: 1 },
-            { name: "KDS (Kitchen Display)", price: 85.00, qty: 1 },
-            { name: "BI (Business Intelligence)", price: 40.80, qty: 1 },
-            { name: "Módulos Gratuitos (iFood, Delivery, etc)", price: 0.00, qty: 1 }
-        ];
-
-        const tbody = document.getElementById('services-body');
-
-        function formatCurrency(value) {
-            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        }
-
-        // Renderiza a tabela inicial
-        function renderTable() {
-            tbody.innerHTML = '';
-            products.forEach((product, index) => {
-                const tr = document.createElement('tr');
-                const priceClass = product.price > 0 ? 'money' : 'money style="color: #bbb;"';
-                
-                tr.innerHTML = `
-                    <td>${product.name}</td>
-                    <td style="text-align: center;">
-                        <input type="number" id="qty-${index}" value="${product.qty}" min="0" oninput="updateCalculations()">
-                    </td>
-                    <td ${priceClass} style="text-align: right;">${formatCurrency(product.price)}</td>
-                    <td class="money" style="text-align: right;" id="subtotal-${index}">${formatCurrency(product.price * product.qty)}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-            updateCalculations();
-        }
-
-        // Atualiza os totais
-        function updateCalculations() {
-            let monthlyTotal = 0;
-
-            // Soma mensalidades
-            products.forEach((product, index) => {
-                const input = document.getElementById(`qty-${index}`);
-                const subtotalEl = document.getElementById(`subtotal-${index}`);
-                const qty = parseInt(input.value) || 0;
-                const subtotal = qty * product.price;
-                
-                subtotalEl.innerText = formatCurrency(subtotal);
-                monthlyTotal += subtotal;
+        function calcularTotal() {
+            let totalMensal = 0;
+            
+            // Soma os módulos e planos (Mensalidade)
+            inputs.forEach(input => {
+                if (input.checked) {
+                    totalMensal += parseFloat(input.getAttribute('data-price'));
+                }
             });
 
-            // Pega valor da implantação
-            const deployInput = document.getElementById('deploy-price');
-            const deployValue = parseFloat(deployInput.value) || 0;
+            // Pega os dados da Implantação
+            const valorImplantacao = parseFloat(inputImplantacao.value) || 0;
+            const qtdParcelas = parseInt(selectParcelas.value) || 1;
+            const valorParcela = valorImplantacao / qtdParcelas;
 
-            // Atualiza display dos totais
-            document.getElementById('monthly-total').innerText = formatCurrency(monthlyTotal);
-            document.getElementById('deploy-total-display').innerText = formatCurrency(deployValue);
+            // Atualiza variáveis globais
+            totalMensalGlobal = totalMensal;
+            totalImplantacaoGlobal = valorImplantacao;
+            qtdParcelasGlobal = qtdParcelas;
+            valorParcelaGlobal = valorParcela;
+
+            // Formatação e exibição na tela
+            displayMensal.textContent = totalMensal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            displayImplantacao.textContent = valorImplantacao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             
-            // Totalzaço (Mensal + Implantação)
-            // Nota: Dependendo da regra de negócio, pode-se querer somar a implantação na "Primeira Parcela" ou mostrar separado.
-            // Aqui estou somando tudo no "Total da Proposta".
-            document.getElementById('grand-total').innerText = formatCurrency(monthlyTotal + deployValue);
+            if (valorImplantacao > 0 && qtdParcelas > 1) {
+                const parcelaFormatada = valorParcela.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                displayTextoParcelas.textContent = `Ou em ${qtdParcelas}x de ${parcelaFormatada}`;
+            } else if (valorImplantacao > 0 && qtdParcelas === 1) {
+                displayTextoParcelas.textContent = `Pagamento à vista`;
+            } else {
+                displayTextoParcelas.textContent = ``;
+            }
         }
 
-        // Função para Gerar PDF
-        function generatePDF() {
-            const element = document.getElementById('element-to-print');
+        // Eventos para recalcular
+        inputs.forEach(input => input.addEventListener('change', calcularTotal));
+        inputImplantacao.addEventListener('input', calcularTotal); 
+        selectParcelas.addEventListener('change', calcularTotal);
+
+        calcularTotal();
+
+        // --- LÓGICA DE GERAÇÃO DE PDF ---
+        document.getElementById('btn-gerar-pdf').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Configuração de Cabeçalho do PDF
+            doc.setFontSize(22);
+            doc.setTextColor(0, 123, 255);
+            doc.text("SILWA TECNOLOGIA", 14, 20);
+
+            doc.setFontSize(14);
+            doc.setTextColor(51, 51, 51);
+            doc.text("Orçamento de Serviços e Módulos", 14, 30);
+
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Data do orçamento: ${dataAtual}`, 14, 38);
+
+            // Tabela apenas com os itens mensais
+            const tableData = [];
+            inputs.forEach(input => {
+                if (input.checked) {
+                    const price = parseFloat(input.getAttribute('data-price'));
+                    if (price > 0 || input.getAttribute('data-name').includes('Cloud')) { 
+                        const name = input.getAttribute('data-name');
+                        const formattedPrice = price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        tableData.push([name, formattedPrice]);
+                    }
+                }
+            });
+
+            doc.autoTable({
+                startY: 45,
+                head: [['Módulos e Serviços (Mensalidade)', 'Valor Mensal']],
+                body: tableData,
+                theme: 'striped',
+                headStyles: { fillColor: [0, 123, 255] },
+                styles: { fontSize: 11 }
+            });
+
+            const finalY = doc.lastAutoTable.finalY || 45;
             
-            // Configurações do PDF
-            const opt = {
-                margin:       [10, 10, 10, 10], // margens top, left, bottom, right
-                filename:     'Orcamento_Silwa.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 }, // Melhora a qualidade
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+            // --- RESUMO FINANCEIRO NO PDF ---
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(0, 123, 255);
+            doc.text("Resumo Financeiro", 14, finalY + 15);
 
-            // Executa a conversão
-            html2pdf().set(opt).from(element).save();
-        }
+            // Total Mensal
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            const totalMensalFormatado = totalMensalGlobal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            doc.text(`Total Mensal (Recorrente): ${totalMensalFormatado}`, 14, finalY + 25);
 
-        renderTable();
+            // Total Implantação e Parcelamento
+            if (totalImplantacaoGlobal > 0) {
+                const totalImplFormatado = totalImplantacaoGlobal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                doc.text(`Total de Implantação (Pagamento Único): ${totalImplFormatado}`, 14, finalY + 33);
+                
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(11);
+                doc.setTextColor(80, 80, 80);
+                
+                if (qtdParcelasGlobal > 1) {
+                    const parcelaFormat = valorParcelaGlobal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    doc.text(`Condição de pagamento da implantação: ${qtdParcelasGlobal}x de ${parcelaFormat} sem juros.`, 14, finalY + 40);
+                } else {
+                    doc.text(`Condição de pagamento da implantação: À vista.`, 14, finalY + 40);
+                }
+            }
+
+            // Rodapé
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(150, 150, 150);
+            doc.text("Este é um orçamento gerado automaticamente. Valores sujeitos a alteração.", 14, finalY + 60);
+
+            // Baixar o arquivo
+            doc.save('Orcamento_Silwa_Tecnologia.pdf');
+        });
     </script>
 </body>
 </html>
