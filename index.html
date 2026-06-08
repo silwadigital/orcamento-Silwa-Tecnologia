@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Silwa Tecnologia - Orçamento</title>
+    <title>Silwa Tecnologia - Orçamento e Contrato</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -17,6 +17,18 @@
         h1 { color: #007bff; font-weight: normal; margin-bottom: 5px; }
         h1 strong { font-weight: bold; }
         .subtitle { color: #666; font-size: 0.9em; margin-bottom: 30px; }
+
+        /* Dados do Cliente */
+        .client-section {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+        .client-section h3 { margin-top: 0; color: #28a745; margin-bottom: 15px;}
 
         /* Grid Principal Ajustado para fluidez com mais cards */
         .grid-container {
@@ -131,11 +143,26 @@
 </head>
 <body>
     <div class="container">
-        <h1>Tabela de preços <br><strong>Silwa Tecnologia | PDV Legal </strong></h1>
-        <p class="subtitle">Escolha os módulos necessários para o seu negócio.</p>
+        <h1>Gerador de Orçamento e Contrato <br><strong>Silwa Tecnologia | PDV Legal </strong></h1>
+        <p class="subtitle">Preencha os dados e escolha os módulos necessários para o seu negócio.</p>
         
+        <!-- Dados do Cliente -->
+        <div class="client-section">
+            <h3>Dados da Empresa (Contratante)</h3>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <div class="input-group" style="flex: 2; min-width: 250px; margin-bottom: 0;">
+                    <label for="input-empresa">Razão Social / Nome da Empresa</label>
+                    <input type="text" id="input-empresa" placeholder="Ex: Supermercado Exemplo LTDA">
+                </div>
+                <div class="input-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                    <label for="input-cnpj">CNPJ</label>
+                    <input type="text" id="input-cnpj" placeholder="00.000.000/0000-00">
+                </div>
+            </div>
+        </div>
+
         <div class="grid-container">
-            
+            <!-- Lista de Módulos Avulsos -->
             <div class="modules-list">
                 <label class="module-item">
                     <div><input type="checkbox" class="calc-item" data-name="Cloud" data-price="79.90"><span class="module-name">Cloud</span></div>
@@ -187,6 +214,7 @@
                 </label>
             </div>
 
+            <!-- Card Planos Combos -->
             <div class="card">
                 <h3>Planos Combos</h3>
                 <label class="radio-item">
@@ -204,6 +232,7 @@
                 </label>
             </div>
 
+            <!-- Card Quantidade de PDVs -->
             <div class="card">
                 <h3>Quantidade de PDV's</h3>
                 <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - Nenhuma" data-price="0" checked> Nenhuma</label>
@@ -219,6 +248,7 @@
                 <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 10" data-price="199.00"> 10 - R$199,00</label>
             </div>
             
+            <!-- Card Planos Delivery Legal -->
             <div class="card">
                 <h3>Planos Delivery Legal</h3>
                 <label class="radio-item">
@@ -234,6 +264,7 @@
                 </label>
             </div>
 
+            <!-- Card Planos Fidelidade Legal -->
             <div class="card">
                 <h3>Módulo Fidelidade Legal</h3>
                 <label class="radio-item">
@@ -293,7 +324,7 @@
                 <div class="installments-text" id="texto-parcelas"></div>
             </div>
 
-            <button class="btn-solicitar" id="btn-gerar-pdf">GERAR ORÇAMENTO EM PDF</button>
+            <button class="btn-solicitar" id="btn-gerar-pdf">GERAR ORÇAMENTO E CONTRATO EM PDF</button>
         </div>
     </div>
 
@@ -318,28 +349,24 @@
         function calcularTotal() {
             let totalMensal = 0;
             
-            // Soma os módulos e planos (Mensalidade)
             inputs.forEach(input => {
                 if (input.checked) {
                     totalMensal += parseFloat(input.getAttribute('data-price'));
                 }
             });
 
-            // Pega os dados da Implantação
             const desconto = parseFloat(inputDesconto.value) || 0;
             const descontoValido = desconto >= 0 && desconto <= 100 ? desconto : 0;
             const valorImplantacaoCalculado = VALOR_IMPLANTACAO_BASE * (1 - (descontoValido / 100));
             const qtdParcelas = parseInt(selectParcelas.value) || 1;
             const valorParcela = valorImplantacaoCalculado / qtdParcelas;
 
-            // Atualiza variáveis globais
             totalMensalGlobal = totalMensal;
             totalImplantacaoGlobal = valorImplantacaoCalculado;
             qtdParcelasGlobal = qtdParcelas;
             valorParcelaGlobal = valorParcela;
             descontoAplicadoGlobal = descontoValido;
 
-            // Formatação e exibição na tela
             displayMensal.textContent = totalMensal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             displayImplantacao.textContent = valorImplantacaoCalculado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             
@@ -353,7 +380,6 @@
             }
         }
 
-        // Eventos para recalcular
         inputs.forEach(input => input.addEventListener('change', calcularTotal));
         inputDesconto.addEventListener('input', calcularTotal); 
         selectParcelas.addEventListener('change', calcularTotal);
@@ -365,7 +391,7 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            // Configuração de Cabeçalho do PDF
+            // ================== PÁGINA 1: ORÇAMENTO ==================
             doc.setFontSize(22);
             doc.setTextColor(0, 123, 255);
             doc.text("SILWA TECNOLOGIA", 14, 20);
@@ -375,11 +401,14 @@
             doc.text("Orçamento de Serviços e Módulos", 14, 30);
 
             const dataAtual = new Date().toLocaleDateString('pt-BR');
+            const nomeEmpresa = document.getElementById('input-empresa').value || 'Não informado';
+            const cnpjEmpresa = document.getElementById('input-cnpj').value || 'Não informado';
+
             doc.setFontSize(10);
             doc.setTextColor(100, 100, 100);
-            doc.text(`Data do orçamento: ${dataAtual}`, 14, 38);
+            doc.text(`Data: ${dataAtual}`, 14, 38);
+            doc.text(`Empresa: ${nomeEmpresa} | CNPJ: ${cnpjEmpresa}`, 14, 43);
 
-            // Tabela apenas com os itens mensais
             const tableData = [];
             inputs.forEach(input => {
                 if (input.checked) {
@@ -393,7 +422,7 @@
             });
 
             doc.autoTable({
-                startY: 45,
+                startY: 50,
                 head: [['Módulos e Serviços (Mensalidade)', 'Valor Mensal']],
                 body: tableData,
                 theme: 'striped',
@@ -401,21 +430,18 @@
                 styles: { fontSize: 11 }
             });
 
-            const finalY = doc.lastAutoTable.finalY || 45;
+            const finalY = doc.lastAutoTable.finalY || 50;
             
-            // --- RESUMO FINANCEIRO NO PDF ---
             doc.setFontSize(14);
             doc.setFont("helvetica", "bold");
             doc.setTextColor(0, 123, 255);
             doc.text("Resumo Financeiro", 14, finalY + 15);
 
-            // Total Mensal
             doc.setFontSize(12);
             doc.setTextColor(0, 0, 0);
             const totalMensalFormatado = totalMensalGlobal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             doc.text(`Total Mensal (Recorrente): ${totalMensalFormatado}`, 14, finalY + 25);
 
-            // Total Implantação e Parcelamento
             let textoImplantacao = `Total de Implantação (Valor Fixo): `;
             if (descontoAplicadoGlobal > 0) {
                 textoImplantacao = `Total de Implantação (Com ${descontoAplicadoGlobal}% de Desconto): `;
@@ -428,6 +454,8 @@
             doc.setFontSize(11);
             doc.setTextColor(80, 80, 80);
             
+            const condicaoParcelasTexto = qtdParcelasGlobal > 1 ? `${qtdParcelasGlobal}x sem juros` : 'À vista';
+
             if (totalImplantacaoGlobal > 0) {
                 if (qtdParcelasGlobal > 1) {
                     const parcelaFormat = valorParcelaGlobal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -439,14 +467,60 @@
                 doc.text(`Condição de pagamento da implantação: Isento.`, 14, finalY + 40);
             }
 
-            // Rodapé
-            doc.setFontSize(10);
+            // ================== PÁGINA 2 E ADIANTE: CONTRATO COM QUEBRA AUTOMÁTICA ==================
+            doc.addPage();
+            
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(0, 123, 255);
+            doc.text("TERMO DE ADESÃO PDV LEGAL / SILWA DIGITAL", 14, 20);
+
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Contratante: ${nomeEmpresa}`, 14, 30);
+            doc.text(`CNPJ: ${cnpjEmpresa}`, 14, 37);
+
             doc.setFont("helvetica", "normal");
-            doc.setTextColor(150, 150, 150);
-            doc.text("Este é um orçamento gerado automaticamente. Valores sujeitos a alteração.", 14, finalY + 60);
+            doc.setFontSize(10);
+
+            // Variável injetando os dados da proposta na cláusula 2.1
+            const termText = `Declaro, para os devidos fins, que são corretos os dados cadastrais e informações por mim prestadas neste instrumento. Declaro estar ciente que a aceitação deste instrumento representa expressa concordância aos termos e condições do “AVISO LEGAL”, que juntamente com esse TERMO DE ADESÃO formam um só instrumento de direito, tendo lido e entendido claramente os termos e condições ajustadas para esta contratação.\n\n` +
+            `1. Sobre a adesão - A adesão do software PDV Legal é online, feito diretamente no sistema, com preenchimento de nome, e-mail e telefone, além de uma senha de acesso, que serão os dados necessários para abertura de uma degustação, chamada “Trial”, que é gratuita por 2 dias, sem obrigatoriedade de inserção de outras informações cadastrais da empresa do cliente.\n\n` +
+            `2. Sobre os planos - O valor do serviço é definido de acordo com o plano escolhido. Sendo cobrados valores avulsos por serviço prestado disponíveis junto com o consultor comercial.\n\n` +
+            `2.1. O valor total da MENSALIDADE contratada (Cessão de uso e módulos) é de ${totalMensalFormatado}. Para a IMPLANTAÇÃO do sistema será cobrado o valor de ${totalImplFormatado}, na condição de pagamento: ${condicaoParcelasTexto}. Podendo ser negociado com o time comercial, desconto para pagamento à vista ou parcelamento.\n\n` +
+            `2.2. Na necessidade de upgrade de plano, a liberação dos produtos será feita em até 24h, com a liquidação do pagamento. Na necessidade de Downgrade de plano a alteração do valor do contrato só será feita na próxima fatura.\n\n` +
+            `3. Contratação – O PDV LEGAL É UMA FERRAMENTA PRÉ PAGA, ou seja, o cliente faz a aquisição da cessão de uso dos serviços de tecnologia para o próximo período de utilização, com base nos valores e planos contratados. A efetivação da contratação do plano é feita diretamente no sistema, aplicando interesse por parte do cliente na utilização da ferramenta, em perfeita concordância aos termos e condições do “AVISO LEGAL”. Com o preenchimento da Razão Social ou Nome completo, CNPJ ou CPF, Endereço completo, nome do representante legal e contatos administrativos, a ferramenta e os serviços estarão disponíveis para utilização para o período contratado, até o vencimento de 30(trinta) dias, no caso de contratação de planos mensais.\n\n` +
+            `3.1. Ao efetivar a contratação, o PDV Legal estará automaticamente autorizado a emitir faturas referente ao uso do software. A ferramenta é pré-paga, necessitando pagamento para a utilização completa nos 30 dias seguintes.\n\n` +
+            `3.2. Em caso de cancelamento da prestação de serviços, durante a vigência do período contratado, a ferramenta continuará disponível até a data final do contrato.\n\n` +
+            `4. Dos meios de pagamento - Ultrapassado o prazo de 2 dias gratuitos, o cliente deve optar pelos planos disponíveis para contratação para utilização do sistema. O pagamento pode ser feito via boleto bancário ou cartão de crédito, de acordo com o pacote e preferência do cliente.\n\n` +
+            `4.1. Caso o cliente faça upgrade ou Downgrade de plano, os valores serão adequados, como citado no tópico 2 deste termo de adesão.\n\n` +
+            `4.2. Notas Fiscais para clientes localizados no Brasil serão emitidas e enviadas ao cliente em até 5 dias após o pagamento, não levando em consideração possíveis problemas com os órgãos governamentais.\n\n` +
+            `5. Suporte - Além da Cessão de uso do PDV Legal, a empresa oferece serviços que já estão incluídos, como suporte técnico online, que ficará disponível em dias úteis, das 9h às 18h, no horário de Brasília e suporte técnico online emergencial das 18h às 22h.\n\n` +
+            `5.1 Implantação - A implantação será realizada por um especialista do PDV Legal. O período contratado de implantação é de dez horas, sendo cinco horas de configuração do retaguarda e mais cinco horas de implantação presencial.\n\n` +
+            `5.2 Implantação - Após a implantação concluída o suporte presencial será cobrado conforme o item 6 do termo de adesão.\n\n` +
+            `6. Visitas técnicas após a implantação serão cobradas uma taxa de deslocamento no valor de R$ 50,00 por hora de visita técnica.\n\n` +
+            `7. Comunicação - Aceitando este TERMO DE ADESÃO, você estará qualificado a receber notícias e informativos via e-mail, não configurando prática de SPAM.\n\n` +
+            `8. O período de vigência do contrato será de 12 meses, contados a partir da data de início da utilização do sistema, sendo renovado automaticamente por igual período caso não haja contestação do cliente.\n\n` +
+            `9. A multa por cancelamento será de 30% do valor total do contrato.\n\n\n` +
+            `PDV Legal | Silwa Digital.`;
+
+            // Divide o texto e cria as quebras de página automáticas
+            const splitText = doc.splitTextToSize(termText, 180);
+            let yPos = 47; // Posição inicial no eixo Y
+
+            for (let i = 0; i < splitText.length; i++) {
+                // Se a posição Y passar de 280 (fim da página A4), cria uma nova página
+                if (yPos > 280) {
+                    doc.addPage();
+                    yPos = 20; // Reseta a margem superior da nova página
+                }
+                
+                doc.text(splitText[i], 14, yPos);
+                yPos += 5; // Aumenta a distância Y para a próxima linha
+            }
 
             // Baixar o arquivo
-            doc.save('Orcamento_Silwa_Tecnologia.pdf');
+            doc.save(`Orcamento_Contrato_${nomeEmpresa.replace(/\s+/g, '_') || 'Silwa'}.pdf`);
         });
     </script>
 </body>
