@@ -18,10 +18,10 @@
         h1 strong { font-weight: bold; }
         .subtitle { color: #666; font-size: 0.9em; margin-bottom: 30px; }
 
-        /* Grid Principal */
+        /* Grid Principal Ajustado para fluidez com mais cards */
         .grid-container {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
         }
 
@@ -68,6 +68,7 @@
         }
         .radio-item input[type="radio"] { margin-right: 8px; }
         .radio-price { color: #00bfff; font-weight: bold; display: block; margin-left: 25px; margin-top: 2px;}
+        .radio-desc { color: #777; font-size: 0.85em; display: block; margin-left: 25px; margin-top: 2px;}
 
         /* Total Section e Implantação */
         .total-section {
@@ -78,7 +79,7 @@
             border: 1px solid #ddd;
             text-align: center;
             margin-top: 30px;
-            max-width: 500px;
+            max-width: 600px;
             margin-left: auto;
             margin-right: auto;
             border-top: 4px solid #00bfff;
@@ -126,11 +127,6 @@
             margin-top: 10px;
         }
         .btn-solicitar:hover { background-color: #0056b3; }
-
-        /* Responsividade */
-        @media (max-width: 900px) {
-            .grid-container { grid-template-columns: 1fr; }
-        }
     </style>
 </head>
 <body>
@@ -166,10 +162,6 @@
                     <span class="price">- R$50,00</span>
                 </label>
                 <label class="module-item">
-                    <div><input type="checkbox" class="calc-item" data-name="Fidelidade Legal" data-price="219.90"><span class="module-name">Fidelidade Legal</span></div>
-                    <span class="price">- R$219,90</span>
-                </label>
-                <label class="module-item">
                     <div><input type="checkbox" class="calc-item" data-name="Módulo Conta Assinada" data-price="00.00"><span class="module-name">Módulo Conta Assinada</span></div>
                     <span class="price">- R$00,00</span>
                 </label>
@@ -196,10 +188,27 @@
             </div>
 
             <div class="card">
+                <h3>Planos Combos</h3>
+                <label class="radio-item">
+                    <input type="radio" name="combos" class="calc-item" data-name="Combo - Nenhum" data-price="0" checked> Nenhum
+                </label>
+                <label class="radio-item">
+                    <input type="radio" name="combos" class="calc-item" data-name="Plano Básico com Fiscal" data-price="235.00"> PLANO BÁSICO com FISCAL
+                    <span class="radio-desc">Gestor em nuvem + emissor de notas + 2 apps + TEF Integrado</span>
+                    <span class="radio-price">R$ 235,00</span>
+                </label>
+                <label class="radio-item">
+                    <input type="radio" name="combos" class="calc-item" data-name="Plano Plus Fiscal + Estoque" data-price="318.90"> PLANO PLUS FISCAL + ESTOQUE
+                    <span class="radio-desc">Gestor em nuvem + emissor de notas + estoque + 2 apps + TEF Integrado</span>
+                    <span class="radio-price">R$ 318,90</span>
+                </label>
+            </div>
+
+            <div class="card">
                 <h3>Quantidade de PDV's</h3>
                 <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - Nenhuma" data-price="0" checked> Nenhuma</label>
-                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 1" data-price="69,90"> 1 - R$69,90</label>
-                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 2" data-price="69,90"> 2 - R$69,90</label>
+                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 1" data-price="69.90"> 1 - R$69,90</label>
+                <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 2" data-price="69.90"> 2 - R$69,90</label>
                 <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 3" data-price="89.90"> 3 - R$89.90</label>
                 <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 4" data-price="89.90"> 4 - R$89.90</label>
                 <label class="radio-item"><input type="radio" name="comandas" class="calc-item" data-name="PDVs - 5" data-price="89.90"> 5 - R$89.90</label>
@@ -224,15 +233,35 @@
                     <span class="radio-price">Acima de 25k de Faturamento - R$279,90</span>
                 </label>
             </div>
+
+            <div class="card">
+                <h3>Módulo Fidelidade Legal</h3>
+                <label class="radio-item">
+                    <input type="radio" name="fidelidade" class="calc-item" data-name="Fidelidade - Não é necessário" data-price="0" checked> Não é necessário
+                </label>
+                <label class="radio-item">
+                    <input type="radio" name="fidelidade" class="calc-item" data-name="Fidelidade Legal" data-price="219.90"> Fidelidade Legal (Padrão)
+                    <span class="radio-price">R$219,90</span>
+                </label>
+                <label class="radio-item">
+                    <input type="radio" name="fidelidade" class="calc-item" data-name="Fidelidade Legal Plus" data-price="375.00"> Fidelidade Legal PLUS
+                    <span class="radio-price">R$375,00</span>
+                </label>
+            </div>
+
         </div>
 
         <div class="total-section">
-            <div style="display: flex; gap: 15px;">
-                <div class="input-group" style="flex: 1;">
-                    <label for="input-implantacao">Valor de Implantação (R$)</label>
-                    <input type="number" id="input-implantacao" placeholder="Ex: 600.00" min="0" step="0.01">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <div class="input-group" style="flex: 1; min-width: 120px;">
+                    <label>Implantação (Base)</label>
+                    <input type="text" value="R$ 1.500,00" readonly style="background-color: #e9ecef; color: #555; font-weight: bold; cursor: not-allowed;">
                 </div>
-                <div class="input-group" style="flex: 1;">
+                <div class="input-group" style="flex: 1; min-width: 120px;">
+                    <label for="input-desconto">Desconto (%)</label>
+                    <input type="number" id="input-desconto" placeholder="Ex: 10" min="0" max="100" step="1" value="0">
+                </div>
+                <div class="input-group" style="flex: 1; min-width: 120px;">
                     <label for="select-parcelas">Parcelamento</label>
                     <select id="select-parcelas">
                         <option value="1">À vista</option>
@@ -259,8 +288,8 @@
             </div>
 
             <div class="total-box">
-                <h4>Total Implantação (Único)</h4>
-                <div class="total-price" id="valor-implantacao-display" style="color: #444; font-size: 1.8em;">R$ 0,00</div>
+                <h4>Total Implantação</h4>
+                <div class="total-price" id="valor-implantacao-display" style="color: #444; font-size: 1.8em;">R$ 1.500,00</div>
                 <div class="installments-text" id="texto-parcelas"></div>
             </div>
 
@@ -271,7 +300,7 @@
     <script>
         // --- LÓGICA DE CÁLCULO ---
         const inputs = document.querySelectorAll('.calc-item');
-        const inputImplantacao = document.getElementById('input-implantacao');
+        const inputDesconto = document.getElementById('input-desconto');
         const selectParcelas = document.getElementById('select-parcelas');
         
         const displayMensal = document.getElementById('valor-mensal');
@@ -279,10 +308,12 @@
         const displayTextoParcelas = document.getElementById('texto-parcelas');
         
         // Variáveis globais para o PDF
+        const VALOR_IMPLANTACAO_BASE = 1500.00;
         let totalMensalGlobal = 0; 
-        let totalImplantacaoGlobal = 0;
+        let totalImplantacaoGlobal = 1500.00;
         let qtdParcelasGlobal = 1;
         let valorParcelaGlobal = 0;
+        let descontoAplicadoGlobal = 0;
 
         function calcularTotal() {
             let totalMensal = 0;
@@ -295,33 +326,36 @@
             });
 
             // Pega os dados da Implantação
-            const valorImplantacao = parseFloat(inputImplantacao.value) || 0;
+            const desconto = parseFloat(inputDesconto.value) || 0;
+            const descontoValido = desconto >= 0 && desconto <= 100 ? desconto : 0;
+            const valorImplantacaoCalculado = VALOR_IMPLANTACAO_BASE * (1 - (descontoValido / 100));
             const qtdParcelas = parseInt(selectParcelas.value) || 1;
-            const valorParcela = valorImplantacao / qtdParcelas;
+            const valorParcela = valorImplantacaoCalculado / qtdParcelas;
 
             // Atualiza variáveis globais
             totalMensalGlobal = totalMensal;
-            totalImplantacaoGlobal = valorImplantacao;
+            totalImplantacaoGlobal = valorImplantacaoCalculado;
             qtdParcelasGlobal = qtdParcelas;
             valorParcelaGlobal = valorParcela;
+            descontoAplicadoGlobal = descontoValido;
 
             // Formatação e exibição na tela
             displayMensal.textContent = totalMensal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            displayImplantacao.textContent = valorImplantacao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            displayImplantacao.textContent = valorImplantacaoCalculado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             
-            if (valorImplantacao > 0 && qtdParcelas > 1) {
+            if (valorImplantacaoCalculado > 0 && qtdParcelas > 1) {
                 const parcelaFormatada = valorParcela.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 displayTextoParcelas.textContent = `Ou em ${qtdParcelas}x de ${parcelaFormatada}`;
-            } else if (valorImplantacao > 0 && qtdParcelas === 1) {
+            } else if (valorImplantacaoCalculado > 0 && qtdParcelas === 1) {
                 displayTextoParcelas.textContent = `Pagamento à vista`;
             } else {
-                displayTextoParcelas.textContent = ``;
+                displayTextoParcelas.textContent = `Isento`;
             }
         }
 
         // Eventos para recalcular
         inputs.forEach(input => input.addEventListener('change', calcularTotal));
-        inputImplantacao.addEventListener('input', calcularTotal); 
+        inputDesconto.addEventListener('input', calcularTotal); 
         selectParcelas.addEventListener('change', calcularTotal);
 
         calcularTotal();
@@ -382,20 +416,27 @@
             doc.text(`Total Mensal (Recorrente): ${totalMensalFormatado}`, 14, finalY + 25);
 
             // Total Implantação e Parcelamento
+            let textoImplantacao = `Total de Implantação (Valor Fixo): `;
+            if (descontoAplicadoGlobal > 0) {
+                textoImplantacao = `Total de Implantação (Com ${descontoAplicadoGlobal}% de Desconto): `;
+            }
+            
+            const totalImplFormatado = totalImplantacaoGlobal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            doc.text(`${textoImplantacao}${totalImplFormatado}`, 14, finalY + 33);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+            doc.setTextColor(80, 80, 80);
+            
             if (totalImplantacaoGlobal > 0) {
-                const totalImplFormatado = totalImplantacaoGlobal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                doc.text(`Total de Implantação (Pagamento Único): ${totalImplFormatado}`, 14, finalY + 33);
-                
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(11);
-                doc.setTextColor(80, 80, 80);
-                
                 if (qtdParcelasGlobal > 1) {
                     const parcelaFormat = valorParcelaGlobal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                     doc.text(`Condição de pagamento da implantação: ${qtdParcelasGlobal}x de ${parcelaFormat} sem juros.`, 14, finalY + 40);
                 } else {
                     doc.text(`Condição de pagamento da implantação: À vista.`, 14, finalY + 40);
                 }
+            } else {
+                doc.text(`Condição de pagamento da implantação: Isento.`, 14, finalY + 40);
             }
 
             // Rodapé
